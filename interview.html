@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>AI Interview Ultra Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;600;800&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+
+body{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(-45deg,#0f2027,#203a43,#2c5364,#00c6ff);
+background-size:400% 400%;
+animation:gradientMove 10s ease infinite;
+color:white;
+overflow:hidden;
+}
+
+@keyframes gradientMove{
+0%{background-position:0% 50%;}
+50%{background-position:100% 50%;}
+100%{background-position:0% 50%;}
+}
+
+.card{
+background:rgba(255,255,255,0.1);
+backdrop-filter:blur(20px);
+padding:30px;
+border-radius:25px;
+width:600px;
+text-align:center;
+box-shadow:0 0 50px rgba(0,0,0,0.4);
+animation:float 3s ease-in-out infinite alternate;
+}
+
+@keyframes float{
+from{transform:translateY(0);}
+to{transform:translateY(-12px);}
+}
+
+input,select,textarea{
+width:100%;
+padding:12px;
+margin:10px 0;
+border:none;
+border-radius:10px;
+}
+
+textarea{height:90px;resize:none;}
+
+button{
+width:100%;
+padding:12px;
+margin-top:10px;
+border:none;
+border-radius:10px;
+background:linear-gradient(45deg,#00ffcc,#00c6ff);
+color:white;
+cursor:pointer;
+font-weight:bold;
+transition:.3s;
+}
+
+button:hover{
+transform:scale(1.08);
+box-shadow:0 0 20px #00ffcc;
+}
+
+#question{
+margin-top:15px;
+font-size:18px;
+min-height:60px;
+transition:.5s;
+}
+
+.slide{
+animation:slide .5s ease;
+}
+
+@keyframes slide{
+from{transform:translateX(50px);opacity:0;}
+to{transform:translateX(0);opacity:1;}
+}
+
+#progressBar{
+height:12px;
+background:#444;
+border-radius:6px;
+margin:12px 0;
+overflow:hidden;
+}
+
+#progress{
+height:100%;
+width:0%;
+background:linear-gradient(90deg,#00ffcc,#00c6ff);
+transition:.5s;
+box-shadow:0 0 15px #00ffcc;
+}
+
+#timer{color:#ffeb3b;font-weight:bold;}
+</style>
+</head>
+<body>
+
+<div class="card">
+
+<h2>🚀 AI Interview Ultra Pro</h2>
+
+<input id="topic" placeholder="Enter Topic">
+<select id="difficulty">
+<option>Easy</option>
+<option>Medium</option>
+<option>Hard</option>
+</select>
+
+<button onclick="startInterview()">Start Interview</button>
+
+<div id="progressBar"><div id="progress"></div></div>
+<div id="timer"></div>
+
+<div id="question"></div>
+<textarea id="answer" placeholder="Type answer..."></textarea>
+
+<button onclick="nextQuestion()">Next Question</button>
+
+</div>
+
+<!-- 🔊 SOUND LINKS -->
+<audio id="clickSound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3"></audio>
+<audio id="successSound" src="https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3"></audio>
+
+<script>
+
+let pool = [
+
+/* 🔹 OOPS & Core Programming */
+"Explain OOP principles with real-world examples.",
+"How would you design a scalable class structure for an e-commerce system?",
+"What is the difference between composition and inheritance?",
+"When should you use abstract class vs interface?",
+"Explain SOLID principles with examples.",
+"What are design patterns? Explain Singleton and Factory pattern.",
+"How does garbage collection work internally?",
+"What are memory leaks and how do you prevent them?",
+
+/* 🔹 Data Structures & Algorithms */
+"Explain time and space complexity with example.",
+"How would you detect a cycle in a linked list?",
+"Difference between stack and queue with real use cases.",
+"Explain recursion with example and its limitations.",
+"How does binary search work?",
+"Explain hashing and collision handling techniques.",
+"How would you optimize a slow algorithm?",
+"What is dynamic programming?",
+
+/* 🔹 JavaScript / Web */
+"Explain event loop in JavaScript in detail.",
+"Difference between var, let, and const.",
+"What are closures in JavaScript?",
+"Explain promises and async/await.",
+"What is debouncing and throttling?",
+"How does the browser rendering process work?",
+"What is CORS and how do you fix CORS errors?",
+"What is the difference between localStorage and sessionStorage?",
+
+/* 🔹 React */
+"What is Virtual DOM and how does it improve performance?",
+"Explain React lifecycle methods.",
+"What are React hooks? Explain useEffect.",
+"How does state management work in React?",
+"What is prop drilling and how do you solve it?",
+"Explain Redux architecture.",
+"What is memoization in React?",
+
+/* 🔹 Backend */
+"What is RESTful API design principle?",
+"Difference between REST and GraphQL.",
+"How do you secure APIs?",
+"Explain JWT authentication flow.",
+"What is middleware in backend frameworks?",
+"What is rate limiting and why is it important?",
+"How does session management work?",
+
+/* 🔹 Database */
+"Difference between SQL and NoSQL.",
+"Explain database normalization with example.",
+"What is indexing and how does it improve performance?",
+"What are ACID properties?",
+"How do you optimize slow database queries?",
+"Explain transactions in database.",
+"What is sharding?",
+
+/* 🔹 DevOps & Cloud */
+"What is CI/CD pipeline?",
+"What is Docker and why is it used?",
+"What is Kubernetes?",
+"What is load balancing?",
+"What is horizontal vs vertical scaling?",
+"What is serverless architecture?",
+"What is caching and where should you use it?",
+
+/* 🔹 Security */
+"What is SQL injection and how to prevent it?",
+"What is XSS attack?",
+"What is encryption vs hashing?",
+"What is OAuth 2.0?",
+"What are common web vulnerabilities?",
+
+/* 🔹 System Design */
+"How would you design a URL shortener like bit.ly?",
+"How would you design a chat application?",
+"How would you design a scalable login system?",
+"How would you handle millions of users on a website?",
+"Explain microservices architecture with pros and cons."
+
+];
+
+let shuffled=[];
+let current=0;
+let score=0;
+let total=10;
+let timerInterval;
+let timeLeft=15;
+
+function playClick(){
+document.getElementById("clickSound").play();
+}
+
+function startInterview(){
+playClick();
+
+let topic=document.getElementById("topic").value;
+if(topic===""){alert("Enter topic");return;}
+
+shuffled = shuffle(pool).slice(0,total);
+current=0;
+score=0;
+show();
+}
+
+function show(){
+if(current>=total){finish();return;}
+
+let q=document.getElementById("question");
+q.classList.remove("slide");
+void q.offsetWidth;
+q.classList.add("slide");
+
+q.innerText=(current+1)+". "+shuffled[current];
+
+document.getElementById("answer").value="";
+updateProgress();
+startTimer();
+}
+
+function nextQuestion(){
+playClick();
+let ans=document.getElementById("answer").value;
+score+=ans.length>15?10:5;
+current++;
+show();
+}
+
+function startTimer(){
+timeLeft=15;
+document.getElementById("timer").innerText="⏳ "+timeLeft+"s";
+clearInterval(timerInterval);
+
+timerInterval=setInterval(()=>{
+timeLeft--;
+document.getElementById("timer").innerText="⏳ "+timeLeft+"s";
+if(timeLeft<=0){
+clearInterval(timerInterval);
+nextQuestion();
+}
+},1000);
+}
+
+function updateProgress(){
+document.getElementById("progress").style.width=(current/total)*100+"%";
+}
+
+function finish(){
+clearInterval(timerInterval);
+let percent=Math.floor((score/100)*100);
+localStorage.setItem("score",percent);
+document.getElementById("successSound").play();
+window.location.href="result.html";
+}
+
+function shuffle(arr){
+for(let i=arr.length-1;i>0;i--){
+let j=Math.floor(Math.random()*(i+1));
+[arr[i],arr[j]]=[arr[j],arr[i]];
+}
+return arr;
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Interview Result</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+<style>
+body{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(45deg,#42275a,#734b6d);
+color:white;
+font-family:Poppins;
+}
+
+.card{
+background:rgba(255,255,255,0.1);
+backdrop-filter:blur(15px);
+padding:40px;
+border-radius:20px;
+text-align:center;
+width:400px;
+}
+
+#circle{
+width:150px;
+height:150px;
+border-radius:50%;
+background:conic-gradient(#00ffcc 0deg, #444 0deg);
+margin:20px auto;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:24px;
+}
+
+button{
+padding:10px 20px;
+border:none;
+border-radius:8px;
+background:#ff5722;
+color:white;
+cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+
+<h2>🎉 Interview Result</h2>
+
+<div id="circle">0%</div>
+
+<div id="details"></div>
+
+<br>
+<button onclick="home()">Back to Home</button>
+
+</div>
+
+<script>
+
+let score=localStorage.getItem("score");
+let topic=localStorage.getItem("topic");
+let difficulty=localStorage.getItem("difficulty");
+
+document.getElementById("details").innerHTML=
+`Topic: ${topic}<br>Difficulty: ${difficulty}`;
+
+let circle=document.getElementById("circle");
+let start=0;
+let end=score*10;
+
+let interval=setInterval(()=>{
+start++;
+circle.style.background=`conic-gradient(#00ffcc ${start*3.6}deg, #444 0deg)`;
+circle.innerText=start+"%";
+if(start>=end){
+clearInterval(interval);
+}
+},20);
+
+function home(){
+window.location.href="index.html";
+}
+
+</script>
+
+</body>
+</html>
